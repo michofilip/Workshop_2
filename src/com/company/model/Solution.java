@@ -26,6 +26,18 @@ public class Solution {
         this.user = User.loadById(user_id);
     }
 
+    @Override
+    public String toString() {
+        return "Solution{" +
+                "id=" + id +
+                ", created='" + created + '\'' +
+                ", updated='" + updated + '\'' +
+                ", description='" + description + '\'' +
+                ", exercise=" + exercise.getId() +
+                ", user=" + user.getId() +
+                '}';
+    }
+
     // getters & setters
     public int getId() {
         return id;
@@ -85,18 +97,7 @@ public class Solution {
         String query = "SELECT id, created, updated, description, excercise_id, user_id FROM solutions";
 
         try {
-            List<String[]> rows = DbService.getData(query, null);
-            for (String[] row : rows) {
-                Solution solution = new Solution();
-                solution.id = Integer.parseInt(row[0]);
-                solution.created = row[1];
-                solution.updated = row[2];
-                solution.description = row[3];
-                solution.exercise = Exercise.loadById(Integer.parseInt(row[4]));
-                solution.user = User.loadById(Integer.parseInt(row[5]));
-
-                list.add(solution);
-            }
+            return getSolutions(DbService.getData(query, null));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -110,19 +111,7 @@ public class Solution {
         try {
             ArrayList<String> params = new ArrayList<>();
             params.add(String.valueOf(id));
-            List<String[]> rows = DbService.getData(query, params);
-
-            String[] row = rows.get(0);
-            Solution solution = new Solution();
-            solution.id = Integer.parseInt(row[0]);
-            solution.created = row[1];
-            solution.updated = row[2];
-            solution.description = row[3];
-            solution.exercise = Exercise.loadById(Integer.parseInt(row[4]));
-            solution.user = User.loadById(Integer.parseInt(row[5]));
-
-            return solution;
-
+            return getSolutions(DbService.getData(query, params)).get(0);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -190,18 +179,7 @@ public class Solution {
         try {
             ArrayList<String> params = new ArrayList<>();
             params.add(String.valueOf(user_id));
-            List<String[]> rows = DbService.getData(query, params);
-            for (String[] row : rows) {
-                Solution solution = new Solution();
-                solution.id = Integer.parseInt(row[0]);
-                solution.created = row[1];
-                solution.updated = row[2];
-                solution.description = row[3];
-                solution.exercise = Exercise.loadById(Integer.parseInt(row[4]));
-                solution.user = User.loadById(Integer.parseInt(row[5]));
-
-                list.add(solution);
-            }
+            return getSolutions(DbService.getData(query, params));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -214,23 +192,9 @@ public class Solution {
         String query = "SELECT id, created, updated, description, exercise_id, user_id FROM solutions WHERE exercise_id = ?";
 
         try {
-
             ArrayList<String> params = new ArrayList<>();
             params.add(String.valueOf(exercise_id));
-            List<String[]> rows = DbService.getData(query, params);
-//            return getSolutions(DbService.getData(query, params));
-
-            for (String[] row : rows) {
-                Solution solution = new Solution();
-                solution.id = Integer.parseInt(row[0]);
-                solution.created = row[1];
-                solution.updated = row[2];
-                solution.description = row[3];
-                solution.exercise = Exercise.loadById(Integer.parseInt(row[4]));
-                solution.user = User.loadById(Integer.parseInt(row[5]));
-
-                list.add(solution);
-            }
+            return getSolutions(DbService.getData(query, params));
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -17,12 +17,23 @@ public class User {
     public User() {
     }
 
-    public User(String name, String username, String password, String email, int group_id) {
+    public User(String username, String password, String email, int group_id) {
         this.id = 0;
         this.username = username;
         this.email = email;
         setPassword(password);
         this.group = Group.loadById(group_id);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", group_id=" + group.getId() +
+                ", group=" + group.getName() +
+                '}';
     }
 
     // getters & setters
@@ -98,15 +109,19 @@ public class User {
             params.add(String.valueOf(id));
             List<String[]> rows = DbService.getData(query, params);
 
-            String[] row = rows.get(0);
-            User user = new User();
-            user.id = Integer.parseInt(row[0]);
-            user.username = row[1];
-            user.email = row[2];
-            user.password = row[3];
-            user.group = Group.loadById(Integer.parseInt(row[4]));
+            if (rows.isEmpty()) {
+                return null;
+            } else {
+                String[] row = rows.get(0);
+                User user = new User();
+                user.id = Integer.parseInt(row[0]);
+                user.username = row[1];
+                user.email = row[2];
+                user.password = row[3];
+                user.group = Group.loadById(Integer.parseInt(row[4]));
 
-            return user;
+                return user;
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -150,11 +165,11 @@ public class User {
         }
     }
 
-    public void delete(int id) throws SQLException {
+    public void delete() {
         if (this.id != 0) {
             String query = "DELETE FROM users WHERE id=?";
             ArrayList<String> params = new ArrayList<>();
-            params.add(String.valueOf(id));
+            params.add(String.valueOf(this.id));
 
             try {
                 DbService.executeUpdate(query, params);
@@ -163,6 +178,35 @@ public class User {
                 e.printStackTrace();
             }
         }
+    }
+
+    // extra
+    public static ArrayList<User> loadAllByGroupId(int groupId) {
+        ArrayList<User> users = new ArrayList<>();
+        //language=MySQL
+        String query = "SELECT id, username, email, password, group_id\n" +
+                "FROM users\n" +
+                "WHERE group_id = ?;";
+
+        try {
+            ArrayList<String> params = new ArrayList<>();
+            params.add(String.valueOf(groupId));
+            List<String[]> rows = DbService.getData(query, params);
+            for (String[] row : rows) {
+                User user = new User();
+                user.id = Integer.parseInt(row[0]);
+                user.username = row[1];
+                user.email = row[2];
+                user.password = row[3];
+                user.group = Group.loadById(Integer.parseInt(row[4]));
+
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
 }

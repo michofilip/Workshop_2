@@ -20,6 +20,15 @@ public class Exercise {
         this.description = description;
     }
 
+    @Override
+    public String toString() {
+        return "Exercise{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
     // getters & setters
     public int getId() {
         return id;
@@ -116,7 +125,7 @@ public class Exercise {
         }
     }
 
-    public void delete(int id) throws SQLException {
+    public void delete() {
         if (this.id != 0) {
             String query = "DELETE FROM exercises WHERE id = ?";
             ArrayList<String> params = new ArrayList<>();
@@ -129,5 +138,32 @@ public class Exercise {
                 e.printStackTrace();
             }
         }
+    }
+
+    // extra
+    public static ArrayList<Exercise> loadAllUnsolvedByUserId(int user_id) {
+        ArrayList<Exercise> list = new ArrayList<>();
+        //language=MySQL
+        String query = "SELECT id, title, description\n" +
+                "FROM exercises\n" +
+                "       LEFT JOIN solutions ON exercises.id = solutions.exercise_id\n" +
+                "       JOIN users ON solutions.user_id = users.id\n" +
+                "WHERE user_id = ? AND exercises IS NULL ";
+
+        try {
+            ArrayList<String> params = new ArrayList<>();
+            List<String[]> rows = DbService.getData(query, params);
+            for (String[] row : rows) {
+                Exercise exercise = new Exercise();
+                exercise.id = Integer.parseInt(row[0]);
+                exercise.title = row[1];
+                exercise.description = row[2];
+                list.add(exercise);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

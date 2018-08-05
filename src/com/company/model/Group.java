@@ -18,6 +18,14 @@ public class Group {
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
     // getters & setters
     public int getId() {
         return id;
@@ -102,7 +110,7 @@ public class Group {
         }
     }
 
-    public void delete(int id) throws SQLException {
+    public void delete() {
         if (this.id != 0) {
             String query = "DELETE FROM groups WHERE id=?";
             ArrayList<String> params = new ArrayList<>();
